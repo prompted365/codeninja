@@ -1,0 +1,3 @@
+.env
+*.env
+N8N_API_KEY
