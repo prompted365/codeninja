@@ -68,10 +68,10 @@ const tools = [
     inputSchema: {
       type: 'object',
       properties: {
-        name: { 
-          type: 'string', 
+        name: {
+          type: 'string',
           description: 'Workflow name',
-          required: true 
+          required: true
         },
         nodes: {
           type: 'array',
@@ -81,7 +81,7 @@ const tools = [
             properties: {
               name: { type: 'string' },
               type: { type: 'string' },
-              position: { 
+              position: {
                 type: 'array',
                 items: { type: 'number' }
               },
@@ -92,9 +92,28 @@ const tools = [
         connections: {
           type: 'object',
           description: 'Node connections'
+        },
+        activate: {
+          type: 'boolean',
+          description: 'Activate the workflow after creation'
         }
       },
       required: ['name']
+    }
+  },
+  {
+    name: 'activate_workflow',
+    description: 'Activate (deploy) an existing workflow',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workflowId: {
+          type: 'string',
+          description: 'Workflow ID',
+          required: true
+        }
+      },
+      required: ['workflowId']
     }
   },
   {
@@ -448,12 +467,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           active: false,
           settings: {}
         };
-        
+
         const response = await api.post('/workflows', workflowData);
+        if (args.activate) {
+          await api.post(`/workflows/${response.data.id}/activate`);
+        }
+
         return {
           content: [{
             type: 'text',
-            text: `Workflow created successfully!\nID: ${response.data.id}\nName: ${response.data.name}`
+            text: `Workflow created successfully!\nID: ${response.data.id}\nName: ${response.data.name}${args.activate ? '\nActivated: true' : ''}`
+          }]
+        };
+      }
+
+      case 'activate_workflow': {
+        await api.post(`/workflows/${args.workflowId}/activate`);
+        return {
+          content: [{
+            type: 'text',
+            text: `Workflow ${args.workflowId} activated`,
           }]
         };
       }
