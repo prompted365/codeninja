@@ -138,6 +138,7 @@ npm start
 - `list_workflows` - List all workflows
 - `get_workflow` - Get workflow details
 - `create_workflow` - Create new workflow
+- `activate_workflow` - Deploy and activate a workflow
 - `execute_workflow` - Run a workflow
 
 </details>
