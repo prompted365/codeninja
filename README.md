@@ -44,6 +44,7 @@ CodeNinja: "Say no more fam" *creates entire workflow in 2.3 seconds*
 - 🔍 **Smart Debugging** → "Why did my workflow crash?"
 - 🔄 **Bulk Operations** → "Add error handling to everything"
 - 🎯 **Pattern Detection** → Finds issues before they happen
+- ⚙️ **Deploy Workflows** → Activate or deactivate with one command
 
 ### 💰 Money Printer Features
 - 🤖 **API Integrations** → Connect anything to anything
@@ -139,6 +140,8 @@ npm start
 - `get_workflow` - Get workflow details
 - `create_workflow` - Create new workflow
 - `execute_workflow` - Run a workflow
+- `activate_workflow` - Deploy/activate a workflow
+- `deactivate_workflow` - Stop a workflow
 
 </details>
 

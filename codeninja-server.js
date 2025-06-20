@@ -373,10 +373,10 @@ const tools = [
     inputSchema: {
       type: 'object',
       properties: {
-        executionId: { 
-          type: 'string', 
+        executionId: {
+          type: 'string',
           description: 'Execution ID',
-          required: true 
+          required: true
         },
         nodeName: {
           type: 'string',
@@ -385,6 +385,36 @@ const tools = [
         }
       },
       required: ['executionId', 'nodeName']
+    }
+  },
+  {
+    name: 'activate_workflow',
+    description: 'Activate (deploy) a workflow',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workflowId: {
+          type: 'string',
+          description: 'Workflow ID',
+          required: true
+        }
+      },
+      required: ['workflowId']
+    }
+  },
+  {
+    name: 'deactivate_workflow',
+    description: 'Deactivate a workflow',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workflowId: {
+          type: 'string',
+          description: 'Workflow ID',
+          required: true
+        }
+      },
+      required: ['workflowId']
     }
   }
 ];
@@ -959,6 +989,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [{
             type: 'text',
             text: JSON.stringify(result, null, 2)
+          }]
+        };
+      }
+
+      case 'activate_workflow':
+      case 'deploy_workflow': {
+        await api.post(`/workflows/${args.workflowId}/activate`);
+        return {
+          content: [{
+            type: 'text',
+            text: `Workflow ${args.workflowId} activated`,
+          }]
+        };
+      }
+
+      case 'deactivate_workflow': {
+        await api.post(`/workflows/${args.workflowId}/deactivate`);
+        return {
+          content: [{
+            type: 'text',
+            text: `Workflow ${args.workflowId} deactivated`,
           }]
         };
       }
