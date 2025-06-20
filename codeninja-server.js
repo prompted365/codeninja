@@ -549,7 +549,8 @@ const tools = [
       type: 'object',
       properties: {
         workflowId: { type: 'string', required: true },
-        intent: { type: 'string', description: 'Refactoring hint' }
+        intent: { type: 'string', description: 'Refactoring hint' },
+        useAI: { type: 'boolean', description: 'Use LLM to refactor code' }
       },
       required: ['workflowId']
     }
@@ -1249,7 +1250,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'convert_workflow_to_code': {
         const workflow = await api.get(`/workflows/${args.workflowId}`);
         let code = generateCodeFromWorkflow(workflow.data);
-        if (args.intent) code = refactorGeneratedCode(code, args.intent);
+        if (args.intent) code = await refactorGeneratedCode(code, args.intent, args.useAI);
         return {
           content: [{ type: 'text', text: code }]
         };
