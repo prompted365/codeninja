@@ -79,6 +79,7 @@ pnpm install
 ```bash
 export N8N_URL="http://localhost:5678"
 export N8N_API_KEY="your-n8n-api-key"
+export OPENAI_API_KEY="your-openai-key" # optional for AI refactoring
 ```
 
 ### 4. Configure Claude Desktop
@@ -125,6 +126,7 @@ node workflow-codegen-server.js
 "Build a complete customer onboarding automation with email sequences"
 "Create a data pipeline that syncs PostgreSQL to Google Sheets every hour"
 "Set up a monitoring system that alerts me when any workflow fails"
+"Convert workflow xyz to code and use AI to apply my refactoring hints"
 ```
 
 ### Money Printer Mode 💸
