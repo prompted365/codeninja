@@ -1,6 +1,7 @@
 // n8n-workflow-editor-mcp-server.js
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import axios from 'axios';
 
 // Configuration
@@ -21,6 +22,10 @@ const server = new Server({
   name: 'n8n-workflow-editor',
   version: '1.0.0',
   description: 'MCP server for programmatically editing n8n workflows'
+}, {
+  capabilities: {
+    tools: {}
+  }
 });
 
 // Tool definitions
@@ -384,11 +389,11 @@ const tools = [
   }
 ];
 
-// Register tools
-server.setRequestHandler('tools/list', async () => ({ tools }));
+// Register tools using MCP schemas
+server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
 
 // Tool implementations
-server.setRequestHandler('tools/call', async (request) => {
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   try {
