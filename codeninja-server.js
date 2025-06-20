@@ -392,10 +392,10 @@ const tools = [
     inputSchema: {
       type: 'object',
       properties: {
-        executionId: { 
-          type: 'string', 
+        executionId: {
+          type: 'string',
           description: 'Execution ID',
-          required: true 
+          required: true
         },
         nodeName: {
           type: 'string',
@@ -404,6 +404,140 @@ const tools = [
         }
       },
       required: ['executionId', 'nodeName']
+    }
+  },
+  {
+    name: 'generate_audit',
+    description: 'Generate a security audit for the n8n instance',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        additionalOptions: {
+          type: 'object',
+          properties: {
+            daysAbandonedWorkflow: { type: 'integer' },
+            categories: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['credentials', 'database', 'nodes', 'filesystem', 'instance']
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    name: 'create_credential',
+    description: 'Create a credential for use in n8n nodes',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        credential: {
+          type: 'object',
+          description: 'Credential data conforming to n8n schema',
+          required: true
+        }
+      },
+      required: ['credential']
+    }
+  },
+  {
+    name: 'list_executions',
+    description: 'Retrieve executions from the instance',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        includeData: { type: 'boolean' },
+        status: { type: 'string' },
+        workflowId: { type: 'string' },
+        projectId: { type: 'string' },
+        limit: { type: 'number' },
+        cursor: { type: 'string' }
+      }
+    }
+  },
+  {
+    name: 'update_workflow',
+    description: 'Update an existing workflow',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workflowId: { type: 'string', required: true },
+        workflow: { type: 'object', required: true }
+      },
+      required: ['workflowId', 'workflow']
+    }
+  },
+  {
+    name: 'delete_workflow',
+    description: 'Delete a workflow',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workflowId: { type: 'string', required: true }
+      },
+      required: ['workflowId']
+    }
+  },
+  {
+    name: 'deactivate_workflow',
+    description: 'Deactivate a workflow',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workflowId: { type: 'string', required: true }
+      },
+      required: ['workflowId']
+    }
+  },
+  {
+    name: 'transfer_workflow',
+    description: 'Transfer a workflow to another project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workflowId: { type: 'string', required: true },
+        destinationProjectId: { type: 'string', required: true }
+      },
+      required: ['workflowId', 'destinationProjectId']
+    }
+  },
+  {
+    name: 'pull_remote',
+    description: 'Pull changes from the connected repository',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        options: { type: 'object' }
+      }
+    }
+  },
+  {
+    name: 'create_variable',
+    description: 'Create a variable in the n8n instance',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        variable: {
+          type: 'object',
+          description: 'Variable payload',
+          required: true
+        }
+      },
+      required: ['variable']
+    }
+  },
+  {
+    name: 'list_variables',
+    description: 'Retrieve instance variables',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'number' },
+        cursor: { type: 'string' }
+      }
     }
   }
 ];
@@ -992,6 +1126,108 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [{
             type: 'text',
             text: JSON.stringify(result, null, 2)
+          }]
+        };
+      }
+
+      case 'generate_audit': {
+        const response = await api.post('/audit', args);
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(response.data, null, 2)
+          }]
+        };
+      }
+
+      case 'create_credential': {
+        const response = await api.post('/credentials', args.credential);
+        return {
+          content: [{
+            type: 'text',
+            text: `Credential created with ID: ${response.data.id}`
+          }]
+        };
+      }
+
+      case 'list_executions': {
+        const response = await api.get('/executions', { params: args });
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(response.data, null, 2)
+          }]
+        };
+      }
+
+      case 'update_workflow': {
+        const response = await api.put(`/workflows/${args.workflowId}`, args.workflow);
+        return {
+          content: [{
+            type: 'text',
+            text: `Workflow ${response.data.id} updated`
+          }]
+        };
+      }
+
+      case 'delete_workflow': {
+        await api.delete(`/workflows/${args.workflowId}`);
+        return {
+          content: [{
+            type: 'text',
+            text: `Workflow ${args.workflowId} deleted`
+          }]
+        };
+      }
+
+      case 'deactivate_workflow': {
+        await api.post(`/workflows/${args.workflowId}/deactivate`);
+        return {
+          content: [{
+            type: 'text',
+            text: `Workflow ${args.workflowId} deactivated`
+          }]
+        };
+      }
+
+      case 'transfer_workflow': {
+        await api.put(`/workflows/${args.workflowId}/transfer`, {
+          destinationProjectId: args.destinationProjectId
+        });
+        return {
+          content: [{
+            type: 'text',
+            text: `Workflow ${args.workflowId} transferred to ${args.destinationProjectId}`
+          }]
+        };
+      }
+
+      case 'pull_remote': {
+        const response = await api.post('/source-control/pull', args.options || {});
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(response.data, null, 2)
+          }]
+        };
+      }
+
+      case 'create_variable': {
+        const response = await api.post('/variables', args.variable);
+        return {
+          content: [{
+            type: 'text',
+            text: `Variable created with ID: ${response.data.id}`
+          }]
+        };
+      }
+
+      case 'list_variables': {
+        const response = await api.get('/variables', { params: args });
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(response.data, null, 2)
           }]
         };
       }
