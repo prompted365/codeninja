@@ -139,7 +139,13 @@ npm start
 - `get_workflow` - Get workflow details
 - `create_workflow` - Create new workflow
 - `activate_workflow` - Deploy and activate a workflow
+- `deactivate_workflow` - Disable a workflow
+- `update_workflow` - Update an existing workflow
+- `delete_workflow` - Delete a workflow
+- `transfer_workflow` - Move a workflow to another project
 - `execute_workflow` - Run a workflow
+- `list_executions` - Query past executions
+- `generate_audit` - Run an instance security audit
 
 </details>
 
@@ -151,6 +157,16 @@ npm start
 - `delete_node` - Remove node
 - `connect_nodes` - Connect two nodes
 - `disconnect_nodes` - Remove connection
+
+</details>
+
+<details>
+<summary><b>🗄️ Instance Tools</b></summary>
+
+- `create_credential` - Add credentials for nodes
+- `pull_remote` - Pull latest workflows from repo
+- `create_variable` - Create an instance variable
+- `list_variables` - List stored variables
 
 </details>
 
