@@ -44,6 +44,7 @@ CodeNinja: "Say no more fam" *creates entire workflow in 2.3 seconds*
 - 🔍 **Smart Debugging** → "Why did my workflow crash?"
 - 🔄 **Bulk Operations** → "Add error handling to everything"
 - 🎯 **Pattern Detection** → Finds issues before they happen
+- 📝 **Workflow → Code** → Convert n8n flows into runnable scripts
 
 ### 💰 Money Printer Features
 - 🤖 **API Integrations** → Connect anything to anything
@@ -101,6 +102,11 @@ export N8N_API_KEY="your-n8n-api-key"
 npm start
 # or
 ./start-ninja.sh 🥷
+```
+
+### 6. Start the CodeGen server (optional)
+```bash
+node workflow-codegen-server.js
 ```
 
 ---

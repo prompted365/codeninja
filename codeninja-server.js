@@ -3,6 +3,8 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import axios from 'axios';
+// Agentic code generation utilities
+import { generateCodeFromWorkflow, refactorGeneratedCode } from './workflow-codegen.js';
 
 // Configuration
 const N8N_URL = process.env.N8N_URL || 'http://localhost:5678';
@@ -538,6 +540,18 @@ const tools = [
         limit: { type: 'number' },
         cursor: { type: 'string' }
       }
+    }
+  },
+  {
+    name: 'convert_workflow_to_code',
+    description: 'Generate raw JavaScript from a workflow',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        workflowId: { type: 'string', required: true },
+        intent: { type: 'string', description: 'Refactoring hint' }
+      },
+      required: ['workflowId']
     }
   }
 ];
@@ -1229,6 +1243,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             type: 'text',
             text: JSON.stringify(response.data, null, 2)
           }]
+        };
+      }
+
+      case 'convert_workflow_to_code': {
+        const workflow = await api.get(`/workflows/${args.workflowId}`);
+        let code = generateCodeFromWorkflow(workflow.data);
+        if (args.intent) code = refactorGeneratedCode(code, args.intent);
+        return {
+          content: [{ type: 'text', text: code }]
         };
       }
 
